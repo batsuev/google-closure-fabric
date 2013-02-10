@@ -12,7 +12,7 @@ class GoogleClosureTemplatesBuilder(BaseCompiler):
     def set_output_path_format(self, path):
         self.__output_path_format = path
 
-    def add_source(self, path):
+    def add_template(self, path):
         self.__inputs.append(path)
 
     def add_dep(self, path):
