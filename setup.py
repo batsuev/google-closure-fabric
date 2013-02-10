@@ -9,7 +9,7 @@ setup(
     license="BSD",
     keywords="google closure gjslint google_closure",
     url="https://github.com/batsuev/google-closure-fabric",
-    packages=['gclosurefab', 'test'],
+    packages=['google_closure_fabric'],
     long_description='TODO',
     classifiers=[
         "Development Status :: 1 - Planning",
