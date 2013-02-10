@@ -67,7 +67,7 @@ def install_closure_stylesheets(path):
 def install_closure_templates(path):
     __download_and_unzip(CLOSURE_TEMPLATES, path, 'google-closure-templates')
 
-def setup(project_path, dir_name = 'google-closure'):
+def bootstrap(project_path, dir_name = 'google-closure'):
     """
     Setup google closure templates, stylesheets and library into project.
     """
