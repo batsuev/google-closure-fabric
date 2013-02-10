@@ -3,6 +3,7 @@ __author__ = 'alex'
 import os, urllib, zipfile
 from fabric.api import local
 from pipes import quote
+from shutil import rmtree
 
 """
 Module for installing closure library, templates and stylesheets into project.
@@ -36,7 +37,7 @@ def __download_and_unzip(url, path, dir_name):
 
     target_path = os.path.join(path, dir_name)
     if os.path.exists(target_path):
-        local('rm -rf %s' % quote(target_path))
+        rmtree(target_path)
 
     zip = zipfile.ZipFile(zip_path)
     zip.extractall(path=target_path)
@@ -45,7 +46,8 @@ def __download_and_unzip(url, path, dir_name):
     os.remove(zip_path)
 
 def __append_to_gitignore(project_path, closure_dir):
-    local('echo %s >> %s/.gitignore' % (quote(closure_dir), quote(project_path)))
+    with open("%s/.gitignore" % quote(project_path), "a") as ignore_file:
+        ignore_file.write(closure_dir)
 
 def update_closure_library(path):
     lib_path = os.path.join(path, 'google-closure-library')
@@ -55,9 +57,10 @@ def update_closure_library(path):
         __svn_checkout(CLOSURE_LIBRARY_SVN, lib_path)
 
 def install_closure_stylesheets(path):
+    print('Installing google closure stylesheets from %s' % CLOSURE_STYLESHEETS)
     stylesheets_path = os.path.join(path, 'google-closure-stylesheets')
     if os.path.exists(stylesheets_path):
-        local('rm -rf %s' % quote(stylesheets_path))
+        rmtree(stylesheets_path)
     os.mkdir(stylesheets_path)
     urllib.urlretrieve(
         CLOSURE_STYLESHEETS,
@@ -65,6 +68,7 @@ def install_closure_stylesheets(path):
     )
 
 def install_closure_templates(path):
+    print('Installing google templates from %s' % CLOSURE_TEMPLATES)
     __download_and_unzip(CLOSURE_TEMPLATES, path, 'google-closure-templates')
 
 def bootstrap(project_path, dir_name = 'google-closure'):
@@ -73,7 +77,7 @@ def bootstrap(project_path, dir_name = 'google-closure'):
     """
     path = os.path.join(project_path, dir_name)
     if not os.path.exists(path):
-        local('mkdir %s', quote(path))
+        os.mkdir(path)
 
     update_closure_library(path)
     install_closure_stylesheets(path)

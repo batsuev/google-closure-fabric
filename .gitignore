@@ -2,3 +2,6 @@
 .DS_Store
 *.iml
 *.pyc
+build/
+dist/
+google_closure_fabric.egg-info/
