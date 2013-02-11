@@ -22,7 +22,14 @@ Example fabfile.py:
         t.set_output_file('js-app/styles/test.min.css')
         t.build()
 
+    def build_deps():
+        t = google_closure_fabric.DepsBuilder(PROJECT_PATH)
+        t.set_source('js-app/src')
+        t.set_output_file('js-app/deps.js')
+        t.build()
+
     def build():
+        build_deps()
         build_templates()
         build_stylesheets()
 
