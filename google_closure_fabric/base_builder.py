@@ -36,5 +36,8 @@ class BaseBuilder:
             return ' '.join([quote(arg) for arg in self.__compiler_args])
         return ''
 
+    def get_compiler_args(self):
+        return self.__compiler_args
+
     def build(self):
         pass

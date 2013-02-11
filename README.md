@@ -42,9 +42,17 @@ Example fabfile.py:
         t.add_exclude('js-app/src/templates/*.soy.js')
         t.autofix()
 
+    def build_js():
+        t = google_closure_fabric.JSBuilder(PROJECT_PATH, advanced=True)
+        t.set_sources_folder('js-app/src')
+        t.set_main_file('test-file.js')
+        t.set_output_file('test.min.js')
+        t.build()
+
     def build():
         check_source_code()
         build_deps()
+        build_js()
         build_templates()
         build_stylesheets()
 
