@@ -22,8 +22,16 @@ Example fabfile.py:
         t.set_output_file('js-app/styles/test.min.css')
         t.build()
 
+    def build():
+        build_templates()
+        build_stylesheets()
+
 Run with:
 
     fab bootstrap
 
-It will create google-closure folder with google closure stylesheets, google closure templates, google closure library and plovr.
+It will create contrib folder with google closure stylesheets, google closure templates, google closure library and plovr.
+
+For building all just type:
+
+    fab build

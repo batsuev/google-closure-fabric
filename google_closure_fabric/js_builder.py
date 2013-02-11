@@ -1,1 +1,4 @@
-__author__ = 'alex'
+from base_builder import BaseBuilder
+
+class JSBuilder(BaseBuilder):
+    pass
