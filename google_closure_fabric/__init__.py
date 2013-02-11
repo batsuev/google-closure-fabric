@@ -4,3 +4,4 @@ from bootstrap import bootstrap
 from templates import TemplatesBuilder
 from stylesheets import StylesheetsBuilder
 from deps import DepsBuilder
+from linter import Linter
