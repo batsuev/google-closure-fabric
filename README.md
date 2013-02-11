@@ -7,17 +7,19 @@ Example fabfile.py:
 
     import google_closure_fabric, os
 
+    PROJECT_PATH = os.path.dirname(__file))
+
     def bootstrap():
-        google_closure_fabric.bootstrap(os.path.dirname(__file__), dir_name = 'contrib')
+        google_closure_fabric.bootstrap(PROJECT_PATH, dir_name = 'contrib')
 
     def build_templates():
-        t = google_closure_fabric.TemplatesBuilder(os.path.dirname(__file__), use_goog=True)
+        t = google_closure_fabric.TemplatesBuilder(PROJECT_PATH, use_goog=True)
         t.add_template('js-app/templates/test.soy')
         t.set_output_path_format('js-app/src/templates/test.soy.js')
         t.build()
 
     def build_stylesheets():
-        t = google_closure_fabric.StylesheetsBuilder(os.path.dirname(__file__))
+        t = google_closure_fabric.StylesheetsBuilder(PROJECT_PATH)
         t.add_stylesheet('js-app/styles/test_style.css')
         t.set_output_file('js-app/styles/test.min.css')
         t.build()
@@ -28,7 +30,20 @@ Example fabfile.py:
         t.set_output_file('js-app/deps.js')
         t.build()
 
+    def check_source_code():
+        t = google_closure_fabric.Linter(PROJECT_PATH, strict=True)
+        t.add_sources('js-app/src')
+        t.add_exclude('js-app/src/templates/*.soy.js')
+        t.lint()
+
+    def autofix_source_code():
+        t = google_closure_fabric.Linter(PROJECT_PATH, strict=True)
+        t.add_sources('js-app/src')
+        t.add_exclude('js-app/src/templates/*.soy.js')
+        t.autofix()
+
     def build():
+        check_source_code()
         build_deps()
         build_templates()
         build_stylesheets()
