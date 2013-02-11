@@ -52,7 +52,8 @@ Run with:
 
     fab bootstrap
 
-It will create contrib folder with google closure stylesheets, google closure templates, google closure library and plovr.
+It will create contrib folder with google closure stylesheets, google closure templates,
+google closure library, google closure compiler and plovr.
 
 For building all just type:
 

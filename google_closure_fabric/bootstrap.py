@@ -13,6 +13,7 @@ TODO: windows support
 CLOSURE_LIBRARY_SVN = 'http://closure-library.googlecode.com/svn/trunk/'
 CLOSURE_STYLESHEETS = 'http://closure-stylesheets.googlecode.com/files/closure-stylesheets-20111230.jar'
 CLOSURE_TEMPLATES = 'http://closure-templates.googlecode.com/files/closure-templates-for-javascript-latest.zip'
+CLOSURE_COMPILER = 'http://closure-compiler.googlecode.com/files/compiler-latest.zip'
 PLOVR = 'http://plovr.googlecode.com/files/plovr-eba786b34df9.jar'
 
 def __svn_up(path):
@@ -76,6 +77,10 @@ def install_closure_stylesheets(path):
         os.path.join(stylesheets_path, 'closure-stylesheets.jar')
     )
 
+def install_closure_compiler(path):
+    print('Installing google closure compiler from %s' % CLOSURE_COMPILER)
+    __download_and_unzip(CLOSURE_COMPILER, path, 'google-closure-compiler')
+
 def install_plovr(path):
     print('Installing plovr from %s' % PLOVR)
     plovr_path = os.path.join(path, 'plovr')
@@ -91,7 +96,7 @@ def install_closure_templates(path):
     print('Installing google closure templates from %s' % CLOSURE_TEMPLATES)
     __download_and_unzip(CLOSURE_TEMPLATES, path, 'google-closure-templates')
 
-def bootstrap(project_path, dir_name=None, templates=True, stylesheets=True, library=True, plovr=True):
+def bootstrap(project_path, dir_name=None, compiler=True, templates=True, stylesheets=True, library=True, plovr=True):
     """
     Setup google closure templates, stylesheets and library into project.
     """
@@ -107,6 +112,8 @@ def bootstrap(project_path, dir_name=None, templates=True, stylesheets=True, lib
     if not os.path.exists(path):
         os.mkdir(path)
 
+    if compiler:
+        install_closure_compiler(path)
     if library:
         update_closure_library(path)
     if stylesheets:
