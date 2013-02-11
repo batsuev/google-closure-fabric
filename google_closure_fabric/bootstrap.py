@@ -13,6 +13,7 @@ TODO: windows support
 CLOSURE_LIBRARY_SVN = 'http://closure-library.googlecode.com/svn/trunk/'
 CLOSURE_STYLESHEETS = 'http://closure-stylesheets.googlecode.com/files/closure-stylesheets-20111230.jar'
 CLOSURE_TEMPLATES = 'http://closure-templates.googlecode.com/files/closure-templates-for-javascript-latest.zip'
+PLOVR = 'http://plovr.googlecode.com/files/plovr-eba786b34df9.jar'
 
 def __svn_up(path):
     try:
@@ -29,11 +30,13 @@ def __svn_checkout(url, path):
 def __download_and_unzip(url, path, dir_name):
     zip_path = os.path.join(path, dir_name + '.zip')
 
-    if not os.path.exists(zip_path):
-        urllib.urlretrieve(
-            url,
-            zip_path
-        )
+    if os.path.exists(zip_path):
+        os.unlink(zip_path)
+
+    urllib.urlretrieve(
+        url,
+        zip_path
+    )
 
     target_path = os.path.join(path, dir_name)
     if os.path.exists(target_path):
@@ -45,9 +48,15 @@ def __download_and_unzip(url, path, dir_name):
 
     os.remove(zip_path)
 
-def __append_to_gitignore(project_path, closure_dir):
-    with open("%s/.gitignore" % quote(project_path), "a") as ignore_file:
-        ignore_file.write(closure_dir)
+def __append_to_gitignore(ignore_string, project_path):
+    gitignore = os.path.join(project_path, '.gitignore')
+    ignore_string += '\n'
+    if os.path.exists(gitignore):
+        content = open(gitignore, 'r').read()
+        if not ignore_string in content:
+            open(gitignore, "a").write(ignore_string)
+    else:
+        open(gitignore, "w").write(ignore_string)
 
 def update_closure_library(path):
     lib_path = os.path.join(path, 'google-closure-library')
@@ -67,21 +76,49 @@ def install_closure_stylesheets(path):
         os.path.join(stylesheets_path, 'closure-stylesheets.jar')
     )
 
+def install_plovr(path):
+    print('Installing plovr from %s' % PLOVR)
+    plovr_path = os.path.join(path, 'plovr')
+    if os.path.exists(plovr_path):
+        rmtree(plovr_path)
+    os.mkdir(plovr_path)
+    urllib.urlretrieve(
+        PLOVR,
+        os.path.join(plovr_path, 'plovr.jar')
+    )
+
 def install_closure_templates(path):
-    print('Installing google templates from %s' % CLOSURE_TEMPLATES)
+    print('Installing google closure templates from %s' % CLOSURE_TEMPLATES)
     __download_and_unzip(CLOSURE_TEMPLATES, path, 'google-closure-templates')
 
-def bootstrap(project_path, dir_name = 'google-closure'):
+def bootstrap(project_path, dir_name=None, templates=True, stylesheets=True, library=True, plovr=True):
     """
     Setup google closure templates, stylesheets and library into project.
     """
+
+    paths_file = '.closure_paths'
+    if dir_name is None:
+        if os.path.exists(paths_file):
+            dir_name = open(paths_file, 'r').read()
+        else:
+            dir_name = 'google_closure'
+
     path = os.path.join(project_path, dir_name)
     if not os.path.exists(path):
         os.mkdir(path)
 
-    update_closure_library(path)
-    install_closure_stylesheets(path)
-    install_closure_templates(path)
+    if library:
+        update_closure_library(path)
+    if stylesheets:
+        install_closure_stylesheets(path)
+    if templates:
+        install_closure_templates(path)
+    if plovr:
+        install_plovr(path)
+
+    with open(paths_file, 'w') as paths:
+        paths.write(dir_name)
 
     if os.path.exists(os.path.join(project_path, '.git')):
-        __append_to_gitignore(project_path, dir_name)
+        __append_to_gitignore(ignore_string=dir_name + '/', project_path=project_path)
+        __append_to_gitignore(ignore_string=paths_file, project_path=project_path)

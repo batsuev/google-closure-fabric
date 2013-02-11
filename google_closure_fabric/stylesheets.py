@@ -1,10 +1,9 @@
 __author__ = 'alex'
-from pipes import quote
 from fabric.api import local
+from base_builder import BaseBuilder
+import os
 
-from base_compiler import BaseCompiler
-
-class GoogleClosureStylesheetsBuilder(BaseCompiler):
+class StylesheetsBuilder(BaseBuilder):
 
     __output_file = None
     __inputs = []
@@ -16,15 +15,18 @@ class GoogleClosureStylesheetsBuilder(BaseCompiler):
         self.__inputs.append(stylesheet)
 
     def build(self):
-        super(GoogleClosureStylesheetsBuilder, self).build()
+        BaseBuilder.build(self)
+
         if self.__output_file is None:
             raise Exception('output_file required')
-        if self.__inputs.count() == 0:
+        if len(self.__inputs) == 0:
             raise Exception('No sources')
+
+        builder_path = os.path.join(self.closure_base_path, 'google-closure-stylesheets', 'closure-stylesheets.jar')
 
         args = ''
         args += self.get_compiler_args_str()
-        args += ' --output-file %s' % quote(self.__output_file)
-        args += ','.join([quote(src) for src in self.__inputs])
+        args += ' --output-file %s' % os.path.join(self.project_path, self.__output_file)
+        args += ' '+','.join([os.path.join(self.project_path, src) for src in self.__inputs])
 
-        local('java jar %s %s' % (self.__compiler_path, args))
+        local('java -jar %s %s' % (builder_path, args))
