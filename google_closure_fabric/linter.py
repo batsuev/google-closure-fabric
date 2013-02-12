@@ -5,11 +5,11 @@ import os
 
 class Linter(BaseBuilder):
 
-    __sources = []
-    __excludes = []
-
     def __init__(self, project_path, strict = True):
         BaseBuilder.__init__(self, project_path)
+        self.__sources = []
+        self.__excludes = []
+
         if strict:
             self.add_compiler_arg('--strict')
 

@@ -3,10 +3,6 @@ import sys, os
 
 class JSBuilder(BaseBuilder):
 
-    __output_file = None
-    __sources_folder = None
-    __main_file = None
-
     def __init__(self, project_path, advanced=True):
         BaseBuilder.__init__(self, project_path)
         if advanced:

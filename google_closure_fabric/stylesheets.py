@@ -5,8 +5,9 @@ import os
 
 class StylesheetsBuilder(BaseBuilder):
 
-    __output_file = None
-    __inputs = []
+    def __init__(self, project_path):
+        self.__inputs = []
+        BaseBuilder.__init__(self, project_path)
 
     def set_output_file(self, path):
         self.__output_file = path

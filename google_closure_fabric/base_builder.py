@@ -3,13 +3,9 @@ from pipes import quote
 import os
 
 class BaseBuilder:
-    __compiler_path = None
-    __compiler_args = []
-
-    closure_base_path = None
-    project_path = None
 
     def __init__(self, project_path):
+        self.__compiler_args = []
         self.project_path = project_path
         self.__init_closure_path()
 

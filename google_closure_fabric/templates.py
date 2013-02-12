@@ -5,11 +5,10 @@ import os
 
 class TemplatesBuilder(BaseBuilder):
 
-    __output_path_format = None
-    __inputs = []
-    __deps = []
-
     def __init__(self, project_path, use_goog=False):
+        self.__inputs = []
+        self.__deps = []
+
         BaseBuilder.__init__(self, project_path)
         if use_goog:
             self.add_compiler_arg('--shouldProvideRequireSoyNamespaces')

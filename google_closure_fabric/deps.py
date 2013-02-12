@@ -4,8 +4,6 @@ from pipes import quote
 import os
 
 class DepsBuilder(BaseBuilder):
-    __output_file = None
-    __source = None
 
     def set_output_file(self, path):
         self.__output_file = path
