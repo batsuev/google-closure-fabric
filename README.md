@@ -1,4 +1,8 @@
 # Installation
+    
+    pip install google_closure_fabric
+    
+or
 
     pip install https://github.com/batsuev/google-closure-fabric/archive/master.zip
 
