@@ -1,6 +1,7 @@
 __author__ = 'alex'
 
 import os, urllib, zipfile
+import platform
 from fabric.api import local
 from pipes import quote
 from shutil import rmtree
@@ -61,6 +62,8 @@ def __append_to_gitignore(ignore_string, project_path):
 
 def update_closure_library(path):
     lib_path = os.path.join(path, 'google-closure-library')
+    if platform.system() == 'Windows':
+        lib_path = '/'.join(lib_path.split('\\'))
     if os.path.exists(lib_path) and os.path.exists(os.path.join(lib_path,'.svn')):
         __svn_up(lib_path)
     else:
