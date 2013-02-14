@@ -11,7 +11,7 @@ Example fabfile.py:
 
     import google_closure_fabric, os
 
-    PROJECT_PATH = os.path.dirname(__file))
+    PROJECT_PATH = os.path.dirname(__file__)
 
     def bootstrap():
         google_closure_fabric.bootstrap(PROJECT_PATH, dir_name = 'contrib')
