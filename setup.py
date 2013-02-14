@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="google_closure_fabric",
-    version="0.0.2",
+    version="0.0.3",
     author="Aleksandr Batsuev",
     author_email="batsuev@gmail.com",
     description="fabric module for simplifying google closure integration",
