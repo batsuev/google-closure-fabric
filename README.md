@@ -32,16 +32,17 @@ Example fabfile.py:
         t = google_closure_fabric.DepsBuilder(PROJECT_PATH)
         t.set_source('js-app/src')
         t.set_output_file('js-app/deps.js')
+        # t.set_custom_path_prefix('/js') - generate deps with '/js' prefixed paths
         t.build()
 
     def check_source_code():
-        t = google_closure_fabric.Linter(PROJECT_PATH, strict=True)
+        t = google_closure_fabric.Linter(PROJECT_PATH, strict=True, ignore_80_symbols=True)
         t.add_sources('js-app/src')
         t.add_exclude('js-app/src/templates/*.soy.js')
         t.lint()
 
     def autofix_source_code():
-        t = google_closure_fabric.Linter(PROJECT_PATH, strict=True)
+        t = google_closure_fabric.Linter(PROJECT_PATH, strict=True, ignore_80_symbols=True)
         t.add_sources('js-app/src')
         t.add_exclude('js-app/src/templates/*.soy.js')
         t.autofix()

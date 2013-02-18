@@ -5,10 +5,11 @@ import os
 
 class Linter(BaseBuilder):
 
-    def __init__(self, project_path, strict = True):
+    def __init__(self, project_path, strict = True, ignore_80_symbols = False):
         BaseBuilder.__init__(self, project_path)
         self.__sources = []
         self.__excludes = []
+        self.__ignore_80_symbols = ignore_80_symbols
 
         if strict:
             self.add_compiler_arg('--strict')
@@ -38,10 +39,25 @@ class Linter(BaseBuilder):
     def autofix(self):
         BaseBuilder.build(self)
 
-        local('fixjsstyle %s' % self.__get_args())
+        executable = self.__get_autofix_executable()
+
+        local('%s %s' % (executable, self.__get_args()))
 
     def lint(self):
         BaseBuilder.build(self)
 
-        local('gjslint %s' % self.__get_args())
+        executable = self.__get_linter_executable()
 
+        local('%s %s' % (executable, self.__get_args()))
+
+    def __get_linter_executable(self):
+        if self.__ignore_80_symbols:
+            return 'python %s' % os.path.join(os.path.dirname(__file__), 'gjslint_ext', 'linter.py')
+        else:
+            return 'gjslint'
+
+    def __get_autofix_executable(self):
+        if self.__ignore_80_symbols:
+            return 'python %s' % os.path.join(os.path.dirname(__file__), 'gjslint_ext', 'autofix.py')
+        else:
+            return 'fixjsstyle'
