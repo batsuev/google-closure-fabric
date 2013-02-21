@@ -26,7 +26,7 @@ class DepsBuilder(BaseBuilder):
         args += ' --output_file=%s' % os.path.join(self.project_path, self.__output_file)
         if not(self.__source is None):
             folder = os.path.join(self.project_path, self.__source)
-            args += " --root_with_prefix=\"%s %s\"" % (quote(folder), quote(self.__get_path_prefix()))
+            args += ' --root_with_prefix="%s %s"' % (quote(folder), quote(self.__get_path_prefix()))
 
         local('python %s %s' % (deps_writer, args))
 
