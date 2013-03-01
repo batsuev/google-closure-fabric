@@ -19,16 +19,24 @@ class DepsBuilder(BaseBuilder):
         if self.__output_file is None:
             raise Exception('output file not specified')
 
-        deps_writer = os.path.join(self.closure_base_path, 'google-closure-library', 'closure', 'bin', 'build', 'depswriter.py')
+        local('python %s %s' % (self.__get_deps_writer(), self.__get_args()))
 
+    def get_deps(self):
+        BaseBuilder.build(self)
+        return local('python %s %s' % (self.__get_deps_writer(), self.__get_args(add_output=False)), capture=True)
+
+    def __get_deps_writer(self):
+        return os.path.join(self.closure_base_path, 'google-closure-library', 'closure', 'bin', 'build', 'depswriter.py')
+
+    def __get_args(self, add_output = True):
         args = ''
         args += self.get_compiler_args_str()
-        args += ' --output_file=%s' % os.path.join(self.project_path, self.__output_file)
+        if add_output:
+            args += ' --output_file=%s' % os.path.join(self.project_path, self.__output_file)
         if not(self.__source is None):
             folder = os.path.join(self.project_path, self.__source)
             args += " --root_with_prefix='%s %s'" % (quote(folder), quote(self.__get_path_prefix()))
-
-        local('python %s %s' % (deps_writer, args))
+        return args
 
     def __get_path_prefix(self):
         if self.__custom_path_prefix is None:

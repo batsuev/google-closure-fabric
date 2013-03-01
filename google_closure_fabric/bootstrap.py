@@ -99,12 +99,17 @@ def install_closure_templates(path):
     print('Installing google closure templates from %s' % CLOSURE_TEMPLATES)
     __download_and_unzip(CLOSURE_TEMPLATES, path, 'google-closure-templates')
 
+def get_paths(project_path):
+    paths_file = os.path.join(project_path, '.closure_paths')
+    paths = open(paths_file, 'r').read()
+    return os.path.join(project_path, paths)
+
 def bootstrap(project_path, dir_name=None, compiler=True, templates=True, stylesheets=True, library=True, plovr=True):
     """
     Setup google closure templates, stylesheets and library into project.
     """
 
-    paths_file = '.closure_paths'
+    paths_file = os.path.join(project_path, '.closure_paths')
     if dir_name is None:
         if os.path.exists(paths_file):
             dir_name = open(paths_file, 'r').read()

@@ -1,7 +1,7 @@
 __author__ = 'alex'
 from fabric.api import local
 from base_builder import BaseBuilder
-import os
+import os, tempfile
 
 class TemplatesBuilder(BaseBuilder):
 
@@ -30,12 +30,26 @@ class TemplatesBuilder(BaseBuilder):
         if len(self.__inputs) == 0:
             raise Exception('No sources')
 
-        builder_path = os.path.join(self.closure_base_path, 'google-closure-templates', 'SoyToJsSrcCompiler.jar')
+        local('java -jar %s %s' % (self.__get_builder_path(), self.__get_args(output_path=os.path.join(self.project_path, self.__output_path_format))))
 
+    def __get_args(self, output_path):
         args = ''
         args += self.get_compiler_args_str()
-        args += ' --outputPathFormat %s' % os.path.join(self.project_path, self.__output_path_format)
+
+        args += ' --outputPathFormat %s' % output_path
         args += ' --srcs %s' % ','.join([os.path.join(self.project_path, src) for src in self.__inputs])
         if len(self.__deps) > 0:
             args += ' --deps %s' % ','.join([os.path.join(self.project_path, src) for src in self.__deps])
-        local('java -jar %s %s' % (builder_path, args))
+        return args
+
+    def __get_builder_path(self):
+        return os.path.join(self.closure_base_path, 'google-closure-templates', 'SoyToJsSrcCompiler.jar')
+
+    def get_template(self):
+        f = tempfile.NamedTemporaryFile(delete=False)
+        local('java -jar %s %s' % (self.__get_builder_path(),
+                                   self.__get_args(output_path=f.name)))
+        res = f.read()
+        f.close()
+        os.unlink(f.name)
+        return res
