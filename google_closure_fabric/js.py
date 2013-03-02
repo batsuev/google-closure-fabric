@@ -51,6 +51,9 @@ class JSBuilder(BaseBuilder):
     def set_main_file(self, file):
         self.__main_file = file
 
+    def get_compiled(self):
+        pass
+
     def build(self):
         BaseBuilder.build(self)
 

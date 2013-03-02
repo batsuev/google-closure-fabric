@@ -1,7 +1,18 @@
 __author__ = 'alex'
 from fabric.api import local
 from base_builder import BaseBuilder
-import os
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler, LoggingEventHandler
+import os, time
+
+class StylesheetsInputChangeEventHandler(FileSystemEventHandler):
+
+    def __init__(self, builder):
+        self.__builder = builder
+        super(StylesheetsInputChangeEventHandler, self).__init__()
+
+    def on_any_event(self, event):
+        self.__builder.build()
 
 class StylesheetsBuilder(BaseBuilder):
 
@@ -14,6 +25,24 @@ class StylesheetsBuilder(BaseBuilder):
 
     def add_stylesheet(self, stylesheet):
         self.__inputs.append(stylesheet)
+
+    def watch(self):
+        event_handler = StylesheetsInputChangeEventHandler(self)
+
+        folders = []
+        for input in self.__inputs:
+            folder = os.path.dirname(os.path.join(self.project_path, input))
+            if not folder in folders:
+                folders.append(folder)
+
+        print 'Start monitoring inputs in %s' % folders
+
+        observer = Observer()
+        for input in folders:
+            observer.schedule(event_handler, input, recursive=True)
+        observer.start()
+
+        return observer
 
     def build(self):
         BaseBuilder.build(self)

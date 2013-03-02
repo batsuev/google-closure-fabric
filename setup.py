@@ -17,7 +17,8 @@ setup(
         "License :: OSI Approved :: BSD License",
     ],
     requires=[
-        "fabric"
+        "fabric",
+        "watchdog"
     ],
     dependency_links=[
         "http://closure-linter.googlecode.com/files/closure_linter-latest.tar.gz"

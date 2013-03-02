@@ -7,8 +7,7 @@ from pipes import quote
 from shutil import rmtree
 
 """
-Module for installing closure library, templates and stylesheets into project.
-TODO: windows support
+Module for installing closure library, templates, stylesheets and plovr into project.
 """
 
 CLOSURE_LIBRARY_SVN = 'http://closure-library.googlecode.com/svn/trunk/'
@@ -104,7 +103,7 @@ def get_paths(project_path):
     paths = open(paths_file, 'r').read()
     return os.path.join(project_path, paths)
 
-def bootstrap(project_path, dir_name=None, compiler=True, templates=True, stylesheets=True, library=True, plovr=True):
+def bootstrap(project_path, dir_name=None, compiler=True, templates=True, stylesheets=True, library=True, plovr=False):
     """
     Setup google closure templates, stylesheets and library into project.
     """
