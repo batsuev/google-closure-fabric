@@ -35,19 +35,20 @@ class RequestHandler(SimpleHTTPRequestHandler):
         else:
             SimpleHTTPRequestHandler.do_GET(self)
 
-def serve(project_path, port = 8000, deps_builder = None, stylesheets_builder = None):
+def serve(project_path, port = 8000, deps_builder = None, stylesheets_builder = None, templates_builder = None):
     httpd = CustomServer(project_path, ("", port), RequestHandler, deps_builder)
     print 'Server started: http://127.0.0.1:%s/' % port
 
-    observer = None
+    stylesheets_observer = None
+    templates_observer = None
     if stylesheets_builder is not None:
-        observer = stylesheets_builder.watch()
+        stylesheets_observer = stylesheets_builder.watch()
+        templates_observer = templates_builder.watch()
 
     httpd.serve_forever()
 
     if stylesheets_builder is not None:
-        observer.stop()
-        observer.join()
-
-if __name__ == '__main__':
-    serve('/Users/alex/Work/livemindmaps/frontend')
+        stylesheets_observer.stop()
+        stylesheets_observer.join()
+        templates_observer.stop()
+        templates_observer.join()

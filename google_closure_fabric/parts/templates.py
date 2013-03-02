@@ -2,15 +2,15 @@ __author__ = 'alex'
 import os
 import tempfile
 from fabric.api import local
-from ..base.base_builder import BaseBuilder
+from ..base.base_builder import BaseObservableBuilder
 
-class TemplatesBuilder(BaseBuilder):
+class TemplatesBuilder(BaseObservableBuilder):
 
-    def __init__(self, project_path, use_goog=False):
+    def __init__(self, project_path, use_goog=True):
         self.__inputs = []
         self.__deps = []
 
-        BaseBuilder.__init__(self, project_path)
+        BaseObservableBuilder.__init__(self, project_path)
         if use_goog:
             self.add_compiler_arg('--shouldProvideRequireSoyNamespaces')
             self.add_compiler_arg('--shouldGenerateJsdoc')
@@ -24,8 +24,11 @@ class TemplatesBuilder(BaseBuilder):
     def add_dep(self, path):
         self.__deps.append(path)
 
+    def get_watch_targets(self):
+        return self.__inputs + self.__deps
+
     def build(self):
-        BaseBuilder.build(self)
+        BaseObservableBuilder.build(self)
         if self.__output_path_format is None:
             raise Exception('output_path_format required')
         if len(self.__inputs) == 0:
