@@ -1,7 +1,7 @@
 import os
 from pipes import quote
 from fabric.api import local
-from base.base_builder import BaseBuilder
+from ..base.base_builder import BaseBuilder
 
 
 class DepsBuilder(BaseBuilder):

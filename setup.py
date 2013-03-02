@@ -9,7 +9,7 @@ setup(
     license="BSD",
     keywords="google closure gjslint soy",
     url="https://github.com/batsuev/google-closure-fabric",
-    packages=['google_closure_fabric', 'google_closure_fabric.gjslint_ext', 'google_closure_fabric.base'],
+    packages=['google_closure_fabric', 'google_closure_fabric.gjslint_ext', 'google_closure_fabric.base', 'google_closure_fabric.parts'],
     long_description=open('README.md', 'r').read(),
     classifiers=[
         "Development Status :: 1 - Planning",

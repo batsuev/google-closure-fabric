@@ -2,8 +2,7 @@ __author__ = 'alex'
 import os
 import tempfile
 from fabric.api import local
-from base.base_builder import BaseBuilder
-
+from ..base.base_builder import BaseBuilder
 
 class TemplatesBuilder(BaseBuilder):
 

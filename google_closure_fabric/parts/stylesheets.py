@@ -1,7 +1,7 @@
 __author__ = 'alex'
 import os
 from fabric.api import local
-from base.base_builder import BaseObservableBuilder
+from ..base.base_builder import BaseObservableBuilder
 
 class StylesheetsBuilder(BaseObservableBuilder):
 

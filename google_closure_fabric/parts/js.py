@@ -1,6 +1,6 @@
 import sys
 import os
-from base.base_builder import BaseBuilder
+from ..base.base_builder import BaseBuilder
 
 class JSBuilder(BaseBuilder):
 
