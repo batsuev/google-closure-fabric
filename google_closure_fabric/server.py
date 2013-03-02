@@ -35,20 +35,32 @@ class RequestHandler(SimpleHTTPRequestHandler):
         else:
             SimpleHTTPRequestHandler.do_GET(self)
 
-def serve(project_path, port = 8000, deps_builder = None, stylesheets_builder = None, templates_builder = None):
+def serve(project_path, port = 8000, deps_builder = None, stylesheets_builder = None, templates_builder = None, js_builder = None):
     httpd = CustomServer(project_path, ("", port), RequestHandler, deps_builder)
     print 'Server started: http://127.0.0.1:%s/' % port
 
     stylesheets_observer = None
     templates_observer = None
+    js_observer = None
     if stylesheets_builder is not None:
         stylesheets_observer = stylesheets_builder.watch()
+
+    if templates_builder is not None:
         templates_observer = templates_builder.watch()
+
+    if js_builder is not None:
+        js_observer = js_builder.watch()
 
     httpd.serve_forever()
 
-    if stylesheets_builder is not None:
+    if stylesheets_observer is not None:
         stylesheets_observer.stop()
         stylesheets_observer.join()
+
+    if templates_observer is not None:
         templates_observer.stop()
         templates_observer.join()
+
+    if js_observer is not None:
+        js_observer.stop()
+        js_observer.join()

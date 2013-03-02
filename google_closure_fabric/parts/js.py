@@ -1,18 +1,18 @@
 import sys
 import os
-from ..base.base_builder import BaseBuilder
+from ..base.base_builder import BaseObservableBuilder
 
-class JSBuilder(BaseBuilder):
+class JSBuilder(BaseObservableBuilder):
 
     def __init__(self, project_path, advanced=True):
-        BaseBuilder.__init__(self, project_path)
+        BaseObservableBuilder.__init__(self, project_path)
         if advanced:
             self.add_compiler_arg('--compilation_level', 'ADVANCED_OPTIMIZATIONS')
             self.add_compiler_arg('--define', 'goog.DEBUG=false')
 
             self.add_compiler_arg('--jscomp_error', 'accessControls')
             self.add_compiler_arg('--jscomp_error', 'ambiguousFunctionDecl')
-            self.add_compiler_arg('--jscomp_error', 'cast')
+            # self.add_compiler_arg('--jscomp_error', 'cast')
             self.add_compiler_arg('--jscomp_error', 'checkRegExp')
             self.add_compiler_arg('--jscomp_error', 'checkTypes')
             self.add_compiler_arg('--jscomp_error', 'checkVars')
@@ -52,11 +52,11 @@ class JSBuilder(BaseBuilder):
     def set_main_file(self, file):
         self.__main_file = file
 
-    def get_compiled(self):
-        pass
+    def get_watch_targets(self):
+        return [self.__sources_folder]
 
     def build(self):
-        BaseBuilder.build(self)
+        BaseObservableBuilder.build(self)
 
         if self.__output_file is None:
             raise Exception('No output file specified')
