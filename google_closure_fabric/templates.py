@@ -1,7 +1,9 @@
 __author__ = 'alex'
+import os
+import tempfile
 from fabric.api import local
-from base_builder import BaseBuilder
-import os, tempfile
+from base.base_builder import BaseBuilder
+
 
 class TemplatesBuilder(BaseBuilder):
 

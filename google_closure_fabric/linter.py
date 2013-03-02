@@ -1,7 +1,8 @@
 __author__ = 'alex'
-from base_builder import BaseBuilder
-from fabric.api import local
 import os
+
+from fabric.api import local
+from base.base_builder import BaseBuilder
 
 class Linter(BaseBuilder):
 

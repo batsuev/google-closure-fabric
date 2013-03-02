@@ -1,24 +1,13 @@
 __author__ = 'alex'
+import os
 from fabric.api import local
-from base_builder import BaseBuilder
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler, LoggingEventHandler
-import os, time
+from base.base_builder import BaseObservableBuilder
 
-class StylesheetsInputChangeEventHandler(FileSystemEventHandler):
-
-    def __init__(self, builder):
-        self.__builder = builder
-        super(StylesheetsInputChangeEventHandler, self).__init__()
-
-    def on_any_event(self, event):
-        self.__builder.build()
-
-class StylesheetsBuilder(BaseBuilder):
+class StylesheetsBuilder(BaseObservableBuilder):
 
     def __init__(self, project_path):
         self.__inputs = []
-        BaseBuilder.__init__(self, project_path)
+        BaseObservableBuilder.__init__(self, project_path)
 
     def set_output_file(self, path):
         self.__output_file = path
@@ -26,37 +15,11 @@ class StylesheetsBuilder(BaseBuilder):
     def add_stylesheet(self, stylesheet):
         self.__inputs.append(stylesheet)
 
-    def watch(self):
-
-        self.build()
-        event_handler = StylesheetsInputChangeEventHandler(self)
-
-        folders = []
-        for input in self.__inputs:
-            folder = os.path.dirname(os.path.join(self.project_path, input))
-            if not folder in folders:
-                folders.append(folder)
-
-        print 'Start monitoring inputs in %s' % folders
-
-        observer = Observer()
-        for input in folders:
-            observer.schedule(event_handler, input, recursive=True)
-        observer.start()
-
-        return observer
-
-    def watch_forever(self):
-        observer = self.watch()
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            observer.stop()
-        observer.join()
+    def get_watch_targets(self):
+        return self.__inputs
 
     def build(self):
-        BaseBuilder.build(self)
+        BaseObservableBuilder.build(self)
 
         if self.__output_file is None:
             raise Exception('output_file required')

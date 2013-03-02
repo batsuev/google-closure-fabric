@@ -1,6 +1,7 @@
-__author__ = 'alex'
 from pipes import quote
-import os
+import os, time
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 class BaseBuilder:
 
@@ -37,3 +38,47 @@ class BaseBuilder:
 
     def build(self):
         pass
+
+
+class ChangeEventHandler(FileSystemEventHandler):
+
+    def __init__(self, builder):
+        self.__builder = builder
+        FileSystemEventHandler.__init__(self)
+
+    def on_any_event(self, event):
+        self.__builder.build()
+
+
+class BaseObservableBuilder(BaseBuilder):
+
+    def get_watch_targets(self):
+        raise Exception('Not implemented')
+
+    def watch(self):
+        self.build()
+        event_handler = ChangeEventHandler(self)
+
+        folders = []
+        for input in self.get_watch_targets():
+            folder = os.path.dirname(os.path.join(self.project_path, input))
+            if not folder in folders:
+                folders.append(folder)
+
+        print 'Start monitoring inputs in %s' % folders
+
+        observer = Observer()
+        for input in folders:
+            observer.schedule(event_handler, input, recursive=True)
+        observer.start()
+
+        return observer
+
+    def watch_forever(self):
+        observer = self.watch()
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            observer.stop()
+        observer.join()
