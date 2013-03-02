@@ -44,6 +44,15 @@ class StylesheetsBuilder(BaseBuilder):
 
         return observer
 
+    def watch_forever(self):
+        observer = self.watch()
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            observer.stop()
+        observer.join()
+
     def build(self):
         BaseBuilder.build(self)
 
