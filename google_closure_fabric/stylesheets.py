@@ -27,6 +27,8 @@ class StylesheetsBuilder(BaseBuilder):
         self.__inputs.append(stylesheet)
 
     def watch(self):
+
+        self.build()
         event_handler = StylesheetsInputChangeEventHandler(self)
 
         folders = []
