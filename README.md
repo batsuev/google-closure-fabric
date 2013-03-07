@@ -6,29 +6,26 @@ or for latest dev version:
 
     pip install https://github.com/batsuev/google-closure-fabric/archive/develop.zip
 
-# Basic usage
-
-## Sample project structure
-Simple project structure:
+# Sample project structure
 * my-project/
-** src/
-*** js/
-*** css/
-*** templates/
-** dist/
-** pages/
-** libs-google/
-* fabfile.py
+    * src/
+        * js/
+        * css/
+        * templates/
+    * dist/
+    * pages/
+    * libs-google/
+    * fabfile.py
 
-src/js - folder with javascript source code.
-src/css - css files
-src/templates - soy templates
-dist - compiled output
-pages - html files
-libs-google - folder for all google libs
-fabfile.py - fabric file
+`src/js` - folder with javascript source code.  
+`src/css` - css sources.  
+`src/templates` - soy templates.  
+`dist` - compiled output.  
+`pages` - html files.  
+`libs-google` - folder for all google libs.  
+`fabfile.py` - fabric file.  
 
-# Install/update libs.
+# Install/update libs/tools for your google closure project.
 
 First of all, we need bootstrap task for setup all required libraries.
 So, simple fabfile.py content:
@@ -44,7 +41,9 @@ So, simple fabfile.py content:
             plovr=False
         )
 
-Running fab bootstrap in project folder will install all libraries to 'libs-google' folder. plovr installation is disabled.
+Running `fab bootstrap` in project folder will install all libraries to `libs-google` folder.
+plovr installation is disabled in this example.
+
 That will be installed:
 * Google Closure Stylesheets (http://code.google.com/p/closure-stylesheets/)
 * Google Closure Templates (https://developers.google.com/closure/templates/)
@@ -54,10 +53,19 @@ That will be installed:
 
 You can disable some of them using bootstrap method arguments.
 
-# Linter
+# Building templates
 TBA
 
-# Building
+# Building stylesheets
+TBA
+
+# Checking source code
+TBA
+
+# Building dependencies
+TBA
+
+# Building javascript
 TBA
 
 # Simple server
