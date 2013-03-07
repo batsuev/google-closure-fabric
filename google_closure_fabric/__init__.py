@@ -1,6 +1,6 @@
 __author__ = 'alex'
 
-from stylesheets import StylesheetsBuilder
+from parts.stylesheets import StylesheetsBuilder
 from parts.deps import DepsBuilder
 from parts.linter import Linter
 from parts.js import JSBuilder

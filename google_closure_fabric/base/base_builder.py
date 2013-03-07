@@ -47,10 +47,13 @@ class ChangeEventHandler(FileSystemEventHandler):
         FileSystemEventHandler.__init__(self)
 
     def on_any_event(self, event):
-        self.__builder.build()
+        self.__builder.build_changes()
 
 
 class BaseObservableBuilder(BaseBuilder):
+
+    def build_changes(self):
+        self.build()
 
     def get_watch_targets(self):
         raise Exception('Not implemented')
@@ -64,8 +67,6 @@ class BaseObservableBuilder(BaseBuilder):
             folder = os.path.dirname(os.path.join(self.project_path, input))
             if not folder in folders:
                 folders.append(folder)
-
-        print 'Start monitoring inputs in %s' % folders
 
         observer = Observer()
         for input in folders:

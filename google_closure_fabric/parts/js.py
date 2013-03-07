@@ -1,5 +1,6 @@
 import sys
 import os
+from fabric.api import local, hide
 from ..base.base_builder import BaseObservableBuilder
 
 class JSBuilder(BaseObservableBuilder):
@@ -55,7 +56,10 @@ class JSBuilder(BaseObservableBuilder):
     def get_watch_targets(self):
         return [self.__sources_folder]
 
-    def build(self):
+    def watch_build(self):
+        self.build(False)
+
+    def build(self, fail_on_error = True):
         BaseObservableBuilder.build(self)
 
         if self.__output_file is None:
@@ -66,6 +70,8 @@ class JSBuilder(BaseObservableBuilder):
 
         if self.__main_file is None:
             raise Exception('No main file specified')
+
+        print 'Building javascript... '
 
         sys.path.append(os.path.join(self.closure_base_path, 'google-closure-library', 'closure', 'bin'))
         import calcdeps
@@ -84,7 +90,11 @@ class JSBuilder(BaseObservableBuilder):
         args.append('%s/deps.js' % closure_src)
 
         search_paths = calcdeps.ExpandDirectories([js_src, closure_src])
-        deps = calcdeps.CalculateDependencies(search_paths, [os.path.join(js_src, self.__main_file)])
 
-        calcdeps.Compile(closure_compiler, deps, sys.stdout, args)
-        print 'Built to %s' % js_out
+        sources = calcdeps.CalculateDependencies(search_paths, [os.path.join(js_src, self.__main_file)])
+        for src in sources:
+            args.append('--js')
+            args.append(src)
+
+        with hide('running'):
+            local('java -jar %s %s' % (closure_compiler, ' '.join(args)))

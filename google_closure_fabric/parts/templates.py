@@ -1,7 +1,7 @@
 __author__ = 'alex'
 import os
 import tempfile
-from fabric.api import local
+from fabric.api import local, hide
 from ..base.base_builder import BaseObservableBuilder
 
 class TemplatesBuilder(BaseObservableBuilder):
@@ -34,7 +34,10 @@ class TemplatesBuilder(BaseObservableBuilder):
         if len(self.__inputs) == 0:
             raise Exception('No sources')
 
-        local('java -jar %s %s' % (self.__get_builder_path(), self.__get_args(output_path=os.path.join(self.project_path, self.__output_path_format))))
+        print 'Building templates... '
+
+        with hide('running'):
+            local('java -jar %s %s' % (self.__get_builder_path(), self.__get_args(output_path=os.path.join(self.project_path, self.__output_path_format))))
 
     def __get_args(self, output_path):
         args = ''

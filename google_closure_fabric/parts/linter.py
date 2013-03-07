@@ -1,7 +1,7 @@
 __author__ = 'alex'
 import os
 
-from fabric.api import local
+from fabric.api import local, hide
 from ..base.base_builder import BaseBuilder
 
 class Linter(BaseBuilder):
@@ -49,7 +49,10 @@ class Linter(BaseBuilder):
 
         executable = self.__get_linter_executable()
 
-        local('%s %s' % (executable, self.__get_args()))
+        print 'Running linter...'
+
+        with hide('running'):
+            local('%s %s' % (executable, self.__get_args()))
 
     def __get_linter_executable(self):
         if self.__ignore_80_symbols:

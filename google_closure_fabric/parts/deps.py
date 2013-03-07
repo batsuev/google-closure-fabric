@@ -1,6 +1,6 @@
 import os
 from pipes import quote
-from fabric.api import local
+from fabric.api import local, hide
 from ..base.base_builder import BaseBuilder
 
 
@@ -15,16 +15,22 @@ class DepsBuilder(BaseBuilder):
     def set_custom_path_prefix(self, path):
         self.__custom_path_prefix = path
 
-    def build(self):
+    def build(self, capture=False):
         BaseBuilder.build(self)
         if self.__output_file is None:
             raise Exception('output file not specified')
 
-        local('python %s %s' % (self.__get_deps_writer(), self.__get_args()))
+        print 'Building deps... '
+
+        with hide('running'):
+            local('python %s %s' % (self.__get_deps_writer(), self.__get_args()), capture=capture)
 
     def get_deps(self):
         BaseBuilder.build(self)
-        return local('python %s %s' % (self.__get_deps_writer(), self.__get_args(add_output=False)), capture=True)
+        res = None
+        with hide('running'):
+            res = local('python %s %s' % (self.__get_deps_writer(), self.__get_args(add_output=False)), capture=True)
+        return res
 
     def __get_deps_writer(self):
         return os.path.join(self.closure_base_path, 'google-closure-library', 'closure', 'bin', 'build', 'depswriter.py')

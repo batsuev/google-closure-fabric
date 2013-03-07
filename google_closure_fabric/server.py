@@ -37,7 +37,6 @@ class RequestHandler(SimpleHTTPRequestHandler):
 
 def serve(project_path, port = 8000, deps_builder = None, stylesheets_builder = None, templates_builder = None, js_builder = None):
     httpd = CustomServer(project_path, ("", port), RequestHandler, deps_builder)
-    print 'Server started: http://127.0.0.1:%s/' % port
 
     stylesheets_observer = None
     templates_observer = None
@@ -51,6 +50,8 @@ def serve(project_path, port = 8000, deps_builder = None, stylesheets_builder = 
     if js_builder is not None:
         js_observer = js_builder.watch()
 
+    print 'Server started: http://127.0.0.1:%s/' % port
+    print 'Start monitoring for changes'
     httpd.serve_forever()
 
     if stylesheets_observer is not None:

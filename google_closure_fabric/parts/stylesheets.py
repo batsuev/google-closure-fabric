@@ -1,6 +1,6 @@
 __author__ = 'alex'
 import os
-from fabric.api import local
+from fabric.api import local, hide
 from ..base.base_builder import BaseObservableBuilder
 
 class StylesheetsBuilder(BaseObservableBuilder):
@@ -26,6 +26,8 @@ class StylesheetsBuilder(BaseObservableBuilder):
         if len(self.__inputs) == 0:
             raise Exception('No sources')
 
+        print 'Building stylesheets... '
+
         builder_path = os.path.join(self.closure_base_path, 'google-closure-stylesheets', 'closure-stylesheets.jar')
 
         args = ''
@@ -33,4 +35,5 @@ class StylesheetsBuilder(BaseObservableBuilder):
         args += ' --output-file %s' % os.path.join(self.project_path, self.__output_file)
         args += ' '+','.join([os.path.join(self.project_path, src) for src in self.__inputs])
 
-        local('java -jar %s %s' % (builder_path, args))
+        with hide('running'):
+            local('java -jar %s %s' % (builder_path, args))
