@@ -1,7 +1,7 @@
 __author__ = 'alex'
 import os
 import tempfile
-from fabric.api import local, hide
+from fabric.api import local, hide, settings
 from ..base.base_builder import BaseObservableBuilder
 
 class TemplatesBuilder(BaseObservableBuilder):
@@ -27,7 +27,7 @@ class TemplatesBuilder(BaseObservableBuilder):
     def get_watch_targets(self):
         return self.__inputs + self.__deps
 
-    def build(self):
+    def build(self, fail_on_error=True):
         BaseObservableBuilder.build(self)
         if self.__output_path_format is None:
             raise Exception('output_path_format required')
@@ -37,7 +37,8 @@ class TemplatesBuilder(BaseObservableBuilder):
         print 'Building templates... '
 
         with hide('running'):
-            local('java -jar %s %s' % (self.__get_builder_path(), self.__get_args(output_path=os.path.join(self.project_path, self.__output_path_format))))
+            with settings(warn_only=not fail_on_error):
+                local('java -jar %s %s' % (self.__get_builder_path(), self.__get_args(output_path=os.path.join(self.project_path, self.__output_path_format))))
 
     def __get_args(self, output_path):
         args = ''

@@ -15,7 +15,7 @@ class DepsBuilder(BaseBuilder):
     def set_custom_path_prefix(self, path):
         self.__custom_path_prefix = path
 
-    def build(self, capture=False):
+    def build(self):
         BaseBuilder.build(self)
         if self.__output_file is None:
             raise Exception('output file not specified')
@@ -23,11 +23,11 @@ class DepsBuilder(BaseBuilder):
         print 'Building deps... '
 
         with hide('running'):
-            local('python %s %s' % (self.__get_deps_writer(), self.__get_args()), capture=capture)
+            local('python %s %s' % (self.__get_deps_writer(), self.__get_args()))
 
     def get_deps(self):
         BaseBuilder.build(self)
-        res = None
+
         with hide('running'):
             res = local('python %s %s' % (self.__get_deps_writer(), self.__get_args(add_output=False)), capture=True)
         return res

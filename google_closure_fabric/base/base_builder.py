@@ -36,7 +36,7 @@ class BaseBuilder:
     def get_compiler_args(self):
         return self.__compiler_args
 
-    def build(self):
+    def build(self, fail_on_error=True):
         pass
 
 
@@ -53,7 +53,7 @@ class ChangeEventHandler(FileSystemEventHandler):
 class BaseObservableBuilder(BaseBuilder):
 
     def build_changes(self):
-        self.build()
+        self.build(fail_on_error=False)
 
     def get_watch_targets(self):
         raise Exception('Not implemented')

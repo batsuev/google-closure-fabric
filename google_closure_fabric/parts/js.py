@@ -1,6 +1,6 @@
 import sys
 import os
-from fabric.api import local, hide
+from fabric.api import local, hide, settings
 from ..base.base_builder import BaseObservableBuilder
 
 class JSBuilder(BaseObservableBuilder):
@@ -59,7 +59,7 @@ class JSBuilder(BaseObservableBuilder):
     def watch_build(self):
         self.build(False)
 
-    def build(self, fail_on_error = True):
+    def build(self, fail_on_error=True):
         BaseObservableBuilder.build(self)
 
         if self.__output_file is None:
@@ -96,5 +96,7 @@ class JSBuilder(BaseObservableBuilder):
             args.append('--js')
             args.append(src)
 
+
         with hide('running'):
-            local('java -jar %s %s' % (closure_compiler, ' '.join(args)))
+            with settings(warn_only=not fail_on_error):
+                local('java -jar %s %s' % (closure_compiler, ' '.join(args)))

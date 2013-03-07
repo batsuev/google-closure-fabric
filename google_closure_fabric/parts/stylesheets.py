@@ -1,6 +1,6 @@
 __author__ = 'alex'
 import os
-from fabric.api import local, hide
+from fabric.api import local, hide, settings
 from ..base.base_builder import BaseObservableBuilder
 
 class StylesheetsBuilder(BaseObservableBuilder):
@@ -18,7 +18,7 @@ class StylesheetsBuilder(BaseObservableBuilder):
     def get_watch_targets(self):
         return self.__inputs
 
-    def build(self):
+    def build(self, fail_on_error=True):
         BaseObservableBuilder.build(self)
 
         if self.__output_file is None:
@@ -36,4 +36,5 @@ class StylesheetsBuilder(BaseObservableBuilder):
         args += ' '+','.join([os.path.join(self.project_path, src) for src in self.__inputs])
 
         with hide('running'):
-            local('java -jar %s %s' % (builder_path, args))
+            with settings(warn_only=not fail_on_error):
+                local('java -jar %s %s' % (builder_path, args))
