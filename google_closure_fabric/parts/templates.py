@@ -40,6 +40,8 @@ class TemplatesBuilder(BaseObservableBuilder):
             with settings(warn_only=not fail_on_error):
                 local('java -jar %s %s' % (self.__get_builder_path(), self.__get_args(output_path=os.path.join(self.project_path, self.__output_path_format))))
 
+        self.build_complete()
+
     def __get_args(self, output_path):
         args = ''
         args += self.get_compiler_args_str()
@@ -55,8 +57,9 @@ class TemplatesBuilder(BaseObservableBuilder):
 
     def get_template(self):
         f = tempfile.NamedTemporaryFile(delete=False)
-        local('java -jar %s %s' % (self.__get_builder_path(),
-                                   self.__get_args(output_path=f.name)))
+        with hide('running'):
+            local('java -jar %s %s' % (self.__get_builder_path(),
+                                       self.__get_args(output_path=f.name)))
         res = f.read()
         f.close()
         os.unlink(f.name)

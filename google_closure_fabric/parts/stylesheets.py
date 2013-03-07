@@ -38,3 +38,5 @@ class StylesheetsBuilder(BaseObservableBuilder):
         with hide('running'):
             with settings(warn_only=not fail_on_error):
                 local('java -jar %s %s' % (builder_path, args))
+
+        self.build_complete()

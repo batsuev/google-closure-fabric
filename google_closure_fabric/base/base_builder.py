@@ -1,5 +1,5 @@
 from pipes import quote
-import os, time
+import os, time, glob, hashlib
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -52,14 +52,55 @@ class ChangeEventHandler(FileSystemEventHandler):
 
 class BaseObservableBuilder(BaseBuilder):
 
+    __built = False # will be implemented a bit later
+    __hashes = {}
+
+    def __has_changes(self):
+        if not self.__built:
+            return True
+        new_hashes = self.__get_hashes()
+        if len(set(self.__hashes.keys()) - set(new_hashes.keys())) > 0:
+            return True
+
+        for path in new_hashes.keys():
+            if self.__hashes[path] != new_hashes[path]:
+                return True
+
+        return False
+
+    def __hash(self, path):
+        f = open(path, 'rb')
+        step = 65536
+        buf = f.read(step)
+        hasher = hashlib.sha256()
+        while len(buf) > 0:
+            hasher.update(buf)
+            buf = f.read(step)
+        return hasher.digest()
+
+    def __get_hashes(self):
+        res = {}
+        for f in self.get_watch_targets():
+            if not f.startswith(self.project_path):
+                f = os.path.join(self.project_path, f)
+            paths = glob.glob(f)
+            for path in paths:
+                res[path] = self.__hash(path)
+        return res
+
     def build_changes(self):
-        self.build(fail_on_error=False)
+        if self.__has_changes():
+            self.build(fail_on_error=False)
+
+    def build_complete(self):
+        self.__built = True
+        self.__hashes = self.__get_hashes()
 
     def get_watch_targets(self):
         raise Exception('Not implemented')
 
     def watch(self):
-        self.build()
+        self.build(fail_on_error=False)
         event_handler = ChangeEventHandler(self)
 
         folders = []

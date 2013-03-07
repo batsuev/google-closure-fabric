@@ -47,6 +47,9 @@ class JSBuilder(BaseObservableBuilder):
     def set_output_file(self, path):
         self.__output_file = path
 
+    def get_output_file(self):
+        return self.__output_file
+
     def set_sources_folder(self, path):
         self.__sources_folder = path
 
@@ -54,10 +57,7 @@ class JSBuilder(BaseObservableBuilder):
         self.__main_file = file
 
     def get_watch_targets(self):
-        return [self.__sources_folder]
-
-    def watch_build(self):
-        self.build(False)
+        return self.__source_files
 
     def build(self, fail_on_error=True):
         BaseObservableBuilder.build(self)
@@ -72,6 +72,8 @@ class JSBuilder(BaseObservableBuilder):
             raise Exception('No main file specified')
 
         print 'Building javascript... '
+
+        self.__source_files = []
 
         sys.path.append(os.path.join(self.closure_base_path, 'google-closure-library', 'closure', 'bin'))
         import calcdeps
@@ -89,14 +91,18 @@ class JSBuilder(BaseObservableBuilder):
         args.append('--js')
         args.append('%s/deps.js' % closure_src)
 
+        self.__source_files.append('%s/deps.js' % closure_src)
+
         search_paths = calcdeps.ExpandDirectories([js_src, closure_src])
 
         sources = calcdeps.CalculateDependencies(search_paths, [os.path.join(js_src, self.__main_file)])
         for src in sources:
             args.append('--js')
             args.append(src)
-
+            self.__source_files.append(src)
 
         with hide('running'):
             with settings(warn_only=not fail_on_error):
                 local('java -jar %s %s' % (closure_compiler, ' '.join(args)))
+
+        self.build_complete()
