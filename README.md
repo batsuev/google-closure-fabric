@@ -1,73 +1,67 @@
 # Installation
     
     pip install google_closure_fabric
-    
-or
 
-    pip install https://github.com/batsuev/google-closure-fabric/archive/master.zip
+or for latest dev version:
 
-# Usage with fabric
-Example fabfile.py:
+    pip install https://github.com/batsuev/google-closure-fabric/archive/develop.zip
+
+# Basic usage
+
+## Sample project structure
+Simple project structure:
+* my-project/
+** src/
+*** js/
+*** css/
+*** templates/
+** dist/
+** pages/
+** libs-google/
+* fabfile.py
+
+src/js - folder with javascript source code.
+src/css - css files
+src/templates - soy templates
+dist - compiled output
+pages - html files
+libs-google - folder for all google libs
+fabfile.py - fabric file
+
+# Install/update libs.
+
+First of all, we need bootstrap task for setup all required libraries.
+So, simple fabfile.py content:
 
     import google_closure_fabric, os
 
     PROJECT_PATH = os.path.dirname(__file__)
 
     def bootstrap():
-        google_closure_fabric.bootstrap(PROJECT_PATH, dir_name = 'contrib')
+        google_closure_fabric.bootstrap(
+            PROJECT_PATH,
+            dir_name='libs-google',
+            plovr=False
+        )
 
-    def build_templates():
-        t = google_closure_fabric.TemplatesBuilder(PROJECT_PATH, use_goog=True)
-        t.add_template('js-app/templates/test.soy')
-        t.set_output_path_format('js-app/src/templates/test.soy.js')
-        t.build()
+Running fab bootstrap in project folder will install all libraries to 'libs-google' folder. plovr installation is disabled.
+That will be installed:
+* Google Closure Stylesheets (http://code.google.com/p/closure-stylesheets/)
+* Google Closure Templates (https://developers.google.com/closure/templates/)
+* Google Closure Compiler (https://developers.google.com/closure/compiler/)
+* Google Closure Library (https://developers.google.com/closure/library/)
+* Plovr (http://plovr.com)
 
-    def build_stylesheets():
-        t = google_closure_fabric.StylesheetsBuilder(PROJECT_PATH)
-        t.add_stylesheet('js-app/styles/test_style.css')
-        t.set_output_file('js-app/styles/test.min.css')
-        t.build()
+You can disable some of them using bootstrap method arguments.
 
-    def build_deps():
-        t = google_closure_fabric.DepsBuilder(PROJECT_PATH)
-        t.set_source('js-app/src')
-        t.set_output_file('js-app/deps.js')
-        # t.set_custom_path_prefix('/js') - generate deps with '/js' prefixed paths
-        t.build()
+# Linter
+TBA
 
-    def check_source_code():
-        t = google_closure_fabric.Linter(PROJECT_PATH, strict=True, ignore_80_symbols=True)
-        t.add_sources('js-app/src')
-        t.add_exclude('js-app/src/templates/*.soy.js')
-        t.lint()
+# Building
+TBA
 
-    def autofix_source_code():
-        t = google_closure_fabric.Linter(PROJECT_PATH, strict=True, ignore_80_symbols=True)
-        t.add_sources('js-app/src')
-        t.add_exclude('js-app/src/templates/*.soy.js')
-        t.autofix()
+# Simple server
+TBA
 
-    def build_js():
-        t = google_closure_fabric.JSBuilder(PROJECT_PATH, advanced=True)
-        t.set_sources_folder('js-app/src')
-        t.set_main_file('test-file.js')
-        t.set_output_file('test.min.js')
-        t.build()
-
-    def build():
-        check_source_code()
-        build_deps()
-        build_js()
-        build_templates()
-        build_stylesheets()
-
-Run with:
-
-    fab bootstrap
-
-It will create contrib folder with google closure stylesheets, google closure templates,
-google closure library, google closure compiler and plovr.
-
-For building all just type:
-
-    fab build
+# Changes watcher
+TBA
