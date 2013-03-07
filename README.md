@@ -25,7 +25,7 @@ or for latest dev version:
 `libs-google` - folder for all google libs.  
 `fabfile.py` - fabric file.  
 
-# Install/update libs/tools for your google closure project.
+# Install into your project
 
 First of all, we need bootstrap task for setup all required libraries.
 So, simple fabfile.py content:
@@ -53,19 +53,21 @@ That will be installed:
 
 You can disable some of them using bootstrap method arguments.
 
-# Building templates
+# Builders
+
+## Building templates
 TBA
 
-# Building stylesheets
+## Building stylesheets
 TBA
 
-# Checking source code
+## Checking source code
 TBA
 
-# Building dependencies
+## Building dependencies
 TBA
 
-# Building javascript
+## Building javascript
 TBA
 
 # Simple server
