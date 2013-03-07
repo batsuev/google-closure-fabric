@@ -56,7 +56,80 @@ You can disable some of them using bootstrap method arguments.
 # Builders
 
 ## Building templates
-TBA
+For building soy templates there are `google_closure_fabirc.TemplatesBuilder` class.
+Simple usage:
+
+    def __get_templates_builder():
+      soy = google_closure_fabric.TemplatesBuilder(PROJECT_PATH, use_goog=True)
+      soy.add_template('src/templates/app.soy')
+      soy.set_output_path_format('src/js/templates/{INPUT_FILE_NAME_NO_EXT}.soy.js')
+      return soy
+
+    def build():
+      __get_templates_builder().build()
+      
+You can add multiple sources using `add_template` method.  
+All additional arguments can be passed using `add_compiler_arg` method.  
+All arguments are described here: https://developers.google.com/closure/templates/docs/javascript_usage  
+If `use_goog` enabled in constructor, the following arguments will be added:
+
+    --shouldProvideRequireSoyNamespaces
+    --shouldGenerateJsdoc
+    
+### Example
+For example, you have the following `src/templates/app.soy` file:
+
+    {namespace app.templates.app}
+
+    /**
+     * Test template
+     */
+    {template .app}
+    <div>test #2</div>
+    {/template}
+    
+You need to build it to `src/js/templates/app.soy.js`, so just place the following code in your `fabfile.py`:
+
+    import google_closure_fabric, os
+
+    PROJECT_PATH = os.path.dirname(__file__)
+    
+    def __get_templates_builder():
+        soy = google_closure_fabric.TemplatesBuilder(PROJECT_PATH, use_goog=True)
+        soy.add_template('src/templates/app.soy')
+        soy.set_output_path_format('src/js/templates/{INPUT_FILE_NAME_NO_EXT}.soy.js')
+        return soy
+
+    def bootstrap():
+        google_closure_fabric.bootstrap(
+            PROJECT_PATH,
+            dir_name='libs-google',
+            plovr=False
+        )
+        
+    def build():
+        __get_templates_builder().build()
+        
+After running `fab build` in your project, you've got the following content in your `src/js/templates/app.soy.js`:
+
+    // This file was automatically generated from app.soy.
+    // Please don't edit this file by hand.
+    
+    goog.provide('lmm.templates.app');
+    
+    goog.require('soy');
+    goog.require('soydata');
+    
+    
+    /**
+     * @param {Object.<string, *>=} opt_data
+     * @param {(null|undefined)=} opt_ignored
+     * @return {string}
+     * @notypecheck
+     */
+    app.templates.app.app = function(opt_data, opt_ignored) {
+      return '<div>test #2</div>';
+    };
 
 ## Building stylesheets
 TBA
@@ -70,7 +143,7 @@ TBA
 ## Building javascript
 TBA
 
-# Simple server
+# Simple dev server
 TBA
 
 # Changes watcher
