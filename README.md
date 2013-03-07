@@ -115,7 +115,7 @@ After running `fab build` in your project, you've got the following content in y
     // This file was automatically generated from app.soy.
     // Please don't edit this file by hand.
     
-    goog.provide('lmm.templates.app');
+    goog.provide('app.templates.app');
     
     goog.require('soy');
     goog.require('soydata');
