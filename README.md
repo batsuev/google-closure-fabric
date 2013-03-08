@@ -6,7 +6,20 @@ or for latest dev version:
 
     pip install https://github.com/batsuev/google-closure-fabric/archive/develop.zip
 
-# Sample project structure
+# Boilerplate
+You can create new project using gclosureboilerplate script. Sample:
+
+    mkdir my-project
+    cd my-project
+    gclosureboilerplate .
+    fab bootstrap
+    fab build
+    fab serve
+
+Open http://localhost:8000/ and enjoy. Or http://localhost:8000/index.min.html for compiled version.
+All changes in sources will rebuild automatically.
+
+# Boilerplate project structure
 * my-project/
     * src/
         * js/
@@ -23,23 +36,9 @@ or for latest dev version:
 `dist` - compiled output.  
 `pages` - html files.  
 `libs-google` - folder for all google libs.  
-`fabfile.py` - fabric file.  
+`fabfile.py` - fabric file with all required tasks.
 
-# Install into your project
-
-First of all, we need bootstrap task for setup all required libraries.
-So, simple fabfile.py content:
-
-    import google_closure_fabric, os
-
-    PROJECT_PATH = os.path.dirname(__file__)
-
-    def bootstrap():
-        google_closure_fabric.bootstrap(
-            PROJECT_PATH,
-            dir_name='libs-google',
-            plovr=False
-        )
+# Google Closure libraries and tools
 
 Running `fab bootstrap` in project folder will install all libraries to `libs-google` folder.
 plovr installation is disabled in this example.
@@ -51,54 +50,44 @@ That will be installed:
 * Google Closure Library (https://developers.google.com/closure/library/)
 * Plovr (http://plovr.com)
 
-You can disable some of them using bootstrap method arguments.
-
-# Builders
-
-## Building templates
-For building soy templates there are `google_closure_fabirc.TemplatesBuilder` class.
-Simple usage:
-
-    def __get_templates_builder():
-      soy = google_closure_fabric.TemplatesBuilder(PROJECT_PATH, use_goog=True)
-      soy.add_template('src/templates/app.soy')
-      soy.set_output_path_format('src/js/templates/{INPUT_FILE_NAME_NO_EXT}.soy.js')
-      return soy
-
-    def build():
-      __get_templates_builder().build()
-      
-You can add multiple sources using `add_template` method.  
-All additional arguments can be passed using `add_compiler_arg` method.  
-All arguments are described here: https://developers.google.com/closure/templates/docs/javascript_usage  
-If `use_goog` enabled in constructor, the following arguments will be added:
-
-    --shouldProvideRequireSoyNamespaces
-    --shouldGenerateJsdoc
-    
-### Example
-For example, you have the following `src/templates/app.soy` file:
-
-    {namespace app.templates.app}
-
-    /**
-     * Test template
-     */
-    {template .app}
-    <div>test #2</div>
-    {/template}
-    
-You need to build it to `src/js/templates/app.soy.js`, so just place the following code in your `fabfile.py`:
+# fabfile.py
 
     import google_closure_fabric, os
 
     PROJECT_PATH = os.path.dirname(__file__)
-    
+    SRC = 'src/js'
+
+    def __get_css_builder():
+        css = google_closure_fabric.StylesheetsBuilder(PROJECT_PATH)
+        css.add_stylesheet('src/css/app.css')
+        css.set_output_file('dist/css/app.min.css')
+        return css
+
+    def __get_deps_builder():
+        deps = google_closure_fabric.DepsBuilder(PROJECT_PATH)
+        deps.set_source(SRC)
+        return deps
+
     def __get_templates_builder():
-        soy = google_closure_fabric.TemplatesBuilder(PROJECT_PATH, use_goog=True)
+        soy = google_closure_fabric.TemplatesBuilder(PROJECT_PATH)
         soy.add_template('src/templates/app.soy')
-        soy.set_output_path_format('src/js/templates/{INPUT_FILE_NAME_NO_EXT}.soy.js')
+        soy.set_output_path_format('src/js/templates/app.soy.js')
         return soy
+
+    def __get_js_builder():
+        js_builder = google_closure_fabric.JSBuilder(PROJECT_PATH)
+        js_builder.set_output_file('dist/js/app.min.js')
+        js_builder.set_sources_folder('src/js')
+        js_builder.set_main_file('app.js')
+        return js_builder
+
+    def __get_linter():
+        linter = google_closure_fabric.Linter(PROJECT_PATH, strict=True, ignore_80_symbols=True)
+        linter.add_sources('src/js')
+        linter.add_exclude('src/js/templates/app.soy.js')
+        linter.add_exclude('src/js/soy.js')
+        linter.add_exclude('src/js/deps.js')
+        return linter
 
     def bootstrap():
         google_closure_fabric.bootstrap(
@@ -106,45 +95,31 @@ You need to build it to `src/js/templates/app.soy.js`, so just place the followi
             dir_name='libs-google',
             plovr=False
         )
-        
+
+    def serve():
+        deps = __get_deps_builder()
+        deps.set_custom_path_prefix('../'+SRC)
+        google_closure_fabric.serve(
+            PROJECT_PATH,
+            html_folder='pages',
+            deps_builder=deps,
+            stylesheets_builder=__get_css_builder(),
+            templates_builder=__get_templates_builder(),
+            js_builder=__get_js_builder()
+        )
+
+    def autofix():
+        __get_linter().autofix()
+
     def build():
+        deps = __get_deps_builder()
+        deps.set_custom_path_prefix(SRC)
+        deps.set_output_file('src/js/deps.js')
+        deps.build()
+
+        __get_linter().lint()
+        __get_css_builder().build()
         __get_templates_builder().build()
-        
-After running `fab build` in your project, you've got the following content in your `src/js/templates/app.soy.js`:
+        __get_js_builder().build()
 
-    // This file was automatically generated from app.soy.
-    // Please don't edit this file by hand.
-    
-    goog.provide('app.templates.app');
-    
-    goog.require('soy');
-    goog.require('soydata');
-    
-    
-    /**
-     * @param {Object.<string, *>=} opt_data
-     * @param {(null|undefined)=} opt_ignored
-     * @return {string}
-     * @notypecheck
-     */
-    app.templates.app.app = function(opt_data, opt_ignored) {
-      return '<div>test #2</div>';
-    };
 
-## Building stylesheets
-TBA
-
-## Checking source code
-TBA
-
-## Building dependencies
-TBA
-
-## Building javascript
-TBA
-
-# Simple dev server
-TBA
-
-# Changes watcher
-TBA
