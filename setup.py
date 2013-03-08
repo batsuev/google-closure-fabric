@@ -22,5 +22,6 @@ setup(
     ],
     dependency_links=[
         "http://closure-linter.googlecode.com/files/closure_linter-latest.tar.gz"
-    ]
+    ],
+    scripts=['scripts/gclosureboilerplate']
 )

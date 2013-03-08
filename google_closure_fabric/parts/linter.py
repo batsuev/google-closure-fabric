@@ -56,12 +56,12 @@ class Linter(BaseBuilder):
 
     def __get_linter_executable(self):
         if self.__ignore_80_symbols:
-            return 'python %s' % os.path.join(os.path.dirname(__file__), 'gjslint_ext', 'linter.py')
+            return 'python %s' % os.path.join(os.path.dirname(__file__), '..', 'gjslint_ext', 'linter.py')
         else:
             return 'gjslint'
 
     def __get_autofix_executable(self):
         if self.__ignore_80_symbols:
-            return 'python %s' % os.path.join(os.path.dirname(__file__), 'gjslint_ext', 'autofix.py')
+            return 'python %s' % os.path.join(os.path.dirname(__file__), '..', 'gjslint_ext', 'autofix.py')
         else:
             return 'fixjsstyle'
