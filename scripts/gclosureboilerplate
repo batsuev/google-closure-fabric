@@ -1,0 +1,198 @@
+#!/usr/bin/python
+import os, sys, urllib
+
+def create_project(path):
+    print 'Creating project in %s' % path
+    path = os.path.abspath(path)
+    # dist
+    os.mkdir(os.path.join(path, 'dist'))
+    os.mkdir(os.path.join(path, 'dist', 'css'))
+    os.mkdir(os.path.join(path, 'dist', 'js'))
+    # src
+    os.mkdir(os.path.join(path, 'src'))
+    os.mkdir(os.path.join(path, 'src', 'js'))
+    os.mkdir(os.path.join(path, 'src', 'css'))
+    os.mkdir(os.path.join(path, 'src', 'templates'))
+    # html pages
+    os.mkdir(os.path.join(path, 'pages'))
+    download_soyutils(path)
+    # fabfile.py
+    create_fabfile(path)
+    # index.html, index.min.html
+    create_html(os.path.join(path, 'pages'), 'index.html', False)
+    create_html(os.path.join(path, 'pages'), 'index.min.html', True)
+    # app.css
+    create_css(path)
+    # app.soy
+    create_soy(path)
+    # Application.js
+    create_js(path)
+    print 'Done'
+
+def download_soyutils(path):
+    urllib.urlretrieve(
+        'http://closure-templates.googlecode.com/svn/trunk/javascript/soyutils_usegoog.js',
+        os.path.join(path, 'src', 'js', 'soy.js')
+    )
+
+def create_html(folder, file, use_compressed):
+    f = open(os.path.join(folder, file), 'w')
+    f.write('''<!doctype html>
+<html>
+    <head>
+        <title>Test page</title>''')
+
+    if use_compressed:
+        f.write('''
+        <link rel="stylesheet" href="/dist/css/app.min.css" />
+        <script type="text/javascript" src="/dist/js/app.min.js"></script>''')
+    else:
+        f.write('''
+        <link rel="stylesheet" href="/src/css/app.css" />
+        <script type="text/javascript" src="/goog/base.js"></script>
+        <script type="text/javascript" src="/deps"></script>
+        <script type="text/javascript">
+            goog.require('app.App');
+        </script>''')
+
+    f.write('''
+    </head>
+    <body>
+    </body>
+</html>''')
+    f.close()
+
+def create_soy(folder):
+    f = open(os.path.join(folder, 'src', 'templates', 'app.soy'), 'w')
+    f.write('''{namespace app.templates.app}
+
+/**
+ * Test template
+ */
+{template .app}
+<div>test template content</div>
+{/template}''')
+    f.close()
+
+def create_js(folder):
+    f = open(os.path.join(folder, 'src', 'js', 'app.js'), 'w')
+    f.write('''goog.provide('app.App');
+goog.require('app.templates.app');
+goog.require('goog.ui.Component');
+goog.require('soy');
+
+
+
+/**
+ * @constructor
+ * @extends {goog.ui.Component}
+ */
+app.App = function() {
+  goog.base(this);
+};
+goog.inherits(app.App, goog.ui.Component);
+goog.addSingletonGetter(app.App);
+
+
+/** @inheritDoc */
+app.App.prototype.createDom = function() {
+  return this.setElementInternal(
+      soy.renderAsElement(app.templates.app.app)
+  );
+};
+
+goog.events.listen(
+    goog.dom.getDomHelper().getWindow(),
+    goog.events.EventType.LOAD,
+    function(e) {
+      app.App.getInstance().render(goog.dom.getElementsByTagNameAndClass('body')[0]);
+    }
+);
+''')
+    f.close()
+
+def create_css(folder):
+    f = open(os.path.join(folder, 'src', 'css', 'app.css'), 'w')
+    f.write('''html, body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    color: rgb(51, 51, 51);
+}''')
+    f.close()
+
+def create_fabfile(path):
+    f = open(os.path.join(path, 'fabfile.py'), 'w')
+    f.write('''import google_closure_fabric, os
+
+PROJECT_PATH = os.path.dirname(__file__)
+SRC = 'src/js'
+
+def __get_css_builder():
+    css = google_closure_fabric.StylesheetsBuilder(PROJECT_PATH)
+    css.add_stylesheet('src/css/app.css')
+    css.set_output_file('dist/css/app.min.css')
+    return css
+
+def __get_deps_builder():
+    deps = google_closure_fabric.DepsBuilder(PROJECT_PATH)
+    deps.set_source(SRC)
+    return deps
+
+def __get_templates_builder():
+    soy = google_closure_fabric.TemplatesBuilder(PROJECT_PATH)
+    soy.add_template('src/templates/app.soy')
+    soy.set_output_path_format('src/js/templates/app.soy.js')
+    return soy
+
+def __get_js_builder():
+    js_builder = google_closure_fabric.JSBuilder(PROJECT_PATH)
+    js_builder.set_output_file('dist/js/app.min.js')
+    js_builder.set_sources_folder('src/js')
+    js_builder.set_main_file('app.js')
+    return js_builder
+
+def __get_linter():
+    linter = google_closure_fabric.Linter(PROJECT_PATH, strict=True, ignore_80_symbols=True)
+    linter.add_sources('src/js')
+    linter.add_exclude('src/js/templates/app.soy.js')
+    linter.add_exclude('src/js/soy.js')
+    linter.add_exclude('src/js/deps.js')
+    return linter
+
+def bootstrap():
+    google_closure_fabric.bootstrap(
+        PROJECT_PATH,
+        dir_name='libs-google',
+        plovr=False
+    )
+
+def serve():
+    deps = __get_deps_builder()
+    deps.set_custom_path_prefix('../'+SRC)
+    google_closure_fabric.serve(
+        PROJECT_PATH,
+        html_folder='pages',
+        deps_builder=deps,
+        stylesheets_builder=__get_css_builder(),
+        templates_builder=__get_templates_builder(),
+        js_builder=__get_js_builder()
+    )
+
+def autofix():
+    __get_linter().autofix()
+
+def build():
+    deps = __get_deps_builder()
+    deps.set_custom_path_prefix(SRC)
+    deps.set_output_file('src/js/deps.js')
+    deps.build()
+
+    __get_linter().lint()
+    __get_css_builder().build()
+    __get_templates_builder().build()
+    __get_js_builder().build()
+    ''')
+    f.close()
+
+if __name__ == '__main__':
+    create_project(sys.argv[1])

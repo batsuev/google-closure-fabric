@@ -1,7 +1,8 @@
 __author__ = 'alex'
-from base_builder import BaseBuilder
-from fabric.api import local
 import os
+
+from fabric.api import local, hide
+from ..base.base_builder import BaseBuilder
 
 class Linter(BaseBuilder):
 
@@ -48,16 +49,19 @@ class Linter(BaseBuilder):
 
         executable = self.__get_linter_executable()
 
-        local('%s %s' % (executable, self.__get_args()))
+        print 'Running linter...'
+
+        with hide('running'):
+            local('%s %s' % (executable, self.__get_args()))
 
     def __get_linter_executable(self):
         if self.__ignore_80_symbols:
-            return 'python %s' % os.path.join(os.path.dirname(__file__), 'gjslint_ext', 'linter.py')
+            return 'python %s' % os.path.join(os.path.dirname(__file__), '..', 'gjslint_ext', 'linter.py')
         else:
             return 'gjslint'
 
     def __get_autofix_executable(self):
         if self.__ignore_80_symbols:
-            return 'python %s' % os.path.join(os.path.dirname(__file__), 'gjslint_ext', 'autofix.py')
+            return 'python %s' % os.path.join(os.path.dirname(__file__), '..', 'gjslint_ext', 'autofix.py')
         else:
             return 'fixjsstyle'
