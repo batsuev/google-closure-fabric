@@ -33,7 +33,7 @@ class StylesheetsBuilder(BaseObservableBuilder):
         args = ''
         args += self.get_compiler_args_str()
         args += ' --output-file %s' % os.path.join(self.project_path, self.__output_file)
-        args += ' '+','.join([os.path.join(self.project_path, src) for src in self.__inputs])
+        args += ' '+' '.join([os.path.join(self.project_path, src) for src in self.__inputs])
 
         with hide('running'):
             with settings(warn_only=not fail_on_error):
